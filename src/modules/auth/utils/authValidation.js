@@ -1,8 +1,14 @@
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+const GMAIL_PATTERN = /^(?=.{1,30}@gmail\.com$)[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*@gmail\.com$/i
+const USERNAME_PATTERN = /^[a-zA-Z0-9_]+$/
 const SUPPORTED_ROLES = new Set(['ADMIN', 'INSTRUCTOR', 'STUDENT'])
 
 export function validateEmail(email) {
   return EMAIL_PATTERN.test(email.trim())
+}
+
+export function validateGmail(email) {
+  return GMAIL_PATTERN.test(email.trim())
 }
 
 export function validateLoginForm({ account, password }) {
@@ -23,40 +29,65 @@ export function validateLoginForm({ account, password }) {
 }
 
 export function validateRegistrationForm({
-  email,
+  username = '',
+  email = '',
   password,
   confirmPassword,
-  fullName,
-  role,
-}) {
+  displayName = '',
+  role = '',
+  yearOfBirth = '',
+  homeTown = '',
+} = {}) {
   const errors = {}
 
-  if (!fullName.trim()) {
-    errors.fullName = 'Họ và tên không được để trống.'
-  } else if (fullName.trim().length < 2) {
-    errors.fullName = 'Họ và tên phải chứa ít nhất 2 ký tự.'
+  if (!username.trim()) {
+    errors.username = 'Tên đăng nhập không được để trống.'
+  } else if (username.length > 50) {
+    errors.username = 'Tên đăng nhập không được vượt quá 50 ký tự.'
+  } else if (!USERNAME_PATTERN.test(username)) {
+    errors.username = 'Tên đăng nhập chỉ được chứa chữ cái, chữ số và dấu gạch dưới (_).'
   }
 
   if (!email.trim()) {
     errors.email = 'Địa chỉ Email không được để trống.'
-  } else if (!validateEmail(email)) {
-    errors.email = 'Định dạng Email không hợp lệ.'
+  } else if (email.trim().length > 100) {
+    errors.email = 'Địa chỉ Email không được vượt quá 100 ký tự.'
+  } else if (!validateGmail(email)) {
+    errors.email = 'Vui lòng nhập địa chỉ Gmail hợp lệ (ví dụ: ten@gmail.com).'
   }
 
   if (!password) {
     errors.password = 'Mật khẩu không được để trống.'
-  } else if (password.length < 6) {
-    errors.password = 'Mật khẩu phải chứa ít nhất 6 ký tự.'
+  } else if (password.length > 50) {
+    errors.password = 'Mật khẩu không được vượt quá 50 ký tự.'
   }
 
   if (!confirmPassword) {
     errors.confirmPassword = 'Vui lòng nhập lại mật khẩu.'
+  } else if (confirmPassword.length > 50) {
+    errors.confirmPassword = 'Mật khẩu nhập lại không được vượt quá 50 ký tự.'
   } else if (password !== confirmPassword) {
     errors.confirmPassword = 'Mật khẩu nhập lại không khớp.'
   }
 
-  if (!SUPPORTED_ROLES.has(role)) {
+  if (!displayName.trim()) {
+    errors.displayName = 'Tên hiển thị không được để trống.'
+  } else if (displayName.length > 200) {
+    errors.displayName = 'Tên hiển thị không được vượt quá 200 ký tự.'
+  }
+
+  if (!role) {
+    errors.role = 'Vui lòng chọn vai trò.'
+  } else if (role.length > 20 || !SUPPORTED_ROLES.has(role)) {
     errors.role = 'Vui lòng chọn quyền tài khoản hợp lệ.'
+  }
+
+  if (yearOfBirth && !/^\d{1,4}$/.test(yearOfBirth)) {
+    errors.yearOfBirth = 'Năm sinh chỉ được chứa tối đa 4 chữ số.'
+  }
+
+  if (homeTown.length > 200) {
+    errors.homeTown = 'Quê quán không được vượt quá 200 ký tự.'
   }
 
   return errors
@@ -64,10 +95,14 @@ export function validateRegistrationForm({
 
 export function createRegistrationPayload(formData) {
   return {
+    username: formData.username.trim(),
     email: formData.email.trim(),
     password: formData.password,
-    fullName: formData.fullName.trim(),
+    confirmPassword: formData.confirmPassword,
+    displayName: formData.displayName.trim(),
     role: formData.role,
+    yearOfBirth: formData.yearOfBirth.trim(),
+    homeTown: formData.homeTown.trim(),
   }
 }
 

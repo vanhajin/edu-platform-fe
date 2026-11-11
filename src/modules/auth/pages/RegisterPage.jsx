@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import AuthLayout, { AuthLink } from '../components/AuthLayout.jsx'
 import FormField from '../components/FormField.jsx'
@@ -10,24 +11,45 @@ import {
 } from '../utils/authValidation.js'
 
 const INITIAL_FORM = {
+  username: '',
   email: '',
   password: '',
   confirmPassword: '',
-  fullName: '',
+  displayName: '',
+  yearOfBirth: '',
+  homeTown: '',
   role: 'STUDENT',
 }
 
 export default function RegisterPage() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [errors, setErrors] = useState({})
-  const [message, setMessage] = useState({ type: '', text: '' })
+  const [apiAlert, setApiAlert] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (!apiAlert) return undefined
+
+    const dismissDelay = apiAlert.type === 'success' ? 1200 : 3500
+    const timeoutId = window.setTimeout(() => {
+      setApiAlert(null)
+      if (apiAlert.type === 'success') {
+        navigate('/login', { replace: true })
+      }
+    }, dismissDelay)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [apiAlert, navigate])
 
   function updateField(event) {
     const { name, value } = event.target
-    setFormData((current) => ({ ...current, [name]: value }))
+    const nextValue = name === 'yearOfBirth'
+      ? value.replace(/\D/g, '').slice(0, 4)
+      : value
+    setFormData((current) => ({ ...current, [name]: nextValue }))
     setErrors((current) => ({ ...current, [name]: '' }))
-    setMessage({ type: '', text: '' })
+    setApiAlert(null)
   }
 
   async function handleSubmit(event) {
@@ -40,14 +62,28 @@ export default function RegisterPage() {
     }
 
     setIsSubmitting(true)
-    setMessage({ type: '', text: '' })
 
     try {
-      await authService.register(createRegistrationPayload(formData))
-      setMessage({ type: 'success', text: 'Đăng ký tài khoản thành công.' })
-      setFormData(INITIAL_FORM)
+      const response = await authService.register(createRegistrationPayload(formData))
+      const responseData = response?.data
+      const isSuccessful =
+        response?.status === 200 &&
+        (responseData?.code == null || String(responseData.code) === '200')
+
+      if (!isSuccessful) {
+        setApiAlert({
+          type: 'error',
+          text: responseData?.message || 'Đăng ký thất bại. Vui lòng thử lại.',
+        })
+        return
+      }
+
+      setApiAlert({
+        type: 'success',
+        text: responseData?.message || 'Đăng ký tài khoản thành công.',
+      })
     } catch (error) {
-      setMessage({
+      setApiAlert({
         type: 'error',
         text: getApiErrorMessage(error, 'Đăng ký thất bại. Vui lòng thử lại.'),
       })
@@ -67,16 +103,56 @@ export default function RegisterPage() {
     >
       <form onSubmit={handleSubmit} noValidate>
         <FormField
-          id="full-name"
-          name="fullName"
+          id="register-username"
+          name="username"
           type="text"
-          label="Họ và tên"
-          placeholder="Ví dụ: Nguyễn Văn A"
+          label="Tên đăng nhập"
+          placeholder="Ví dụ: VanNT_Buyer"
           maxLength={50}
-          value={formData.fullName}
+          pattern="[A-Za-z0-9_]+"
+          value={formData.username}
           onChange={updateField}
-          error={errors.fullName}
+          error={errors.username}
           required
+        />
+
+        <FormField
+          id="display-name"
+          name="displayName"
+          type="text"
+          label="Tên hiển thị"
+          placeholder="Ví dụ: Nguyễn Văn A"
+          maxLength={200}
+          value={formData.displayName}
+          onChange={updateField}
+          error={errors.displayName}
+          required
+        />
+
+        <FormField
+          id="year-of-birth"
+          name="yearOfBirth"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]{0,4}"
+          label="Năm sinh"
+          placeholder="Ví dụ: 2000"
+          maxLength={4}
+          value={formData.yearOfBirth}
+          onChange={updateField}
+          error={errors.yearOfBirth}
+        />
+
+        <FormField
+          id="hometown"
+          name="homeTown"
+          type="text"
+          label="Quê quán"
+          placeholder="Ví dụ: Hải Dương"
+          maxLength={200}
+          value={formData.homeTown}
+          onChange={updateField}
+          error={errors.homeTown}
         />
 
         <FormField
@@ -85,7 +161,8 @@ export default function RegisterPage() {
           type="email"
           label="Địa chỉ Email"
           placeholder="example@gmail.com"
-          maxLength={50}
+          maxLength={100}
+          pattern="[A-Za-z0-9]+(\.[A-Za-z0-9]+)*@gmail\.com"
           value={formData.email}
           onChange={updateField}
           error={errors.email}
@@ -97,8 +174,8 @@ export default function RegisterPage() {
           name="password"
           type="password"
           label="Mật khẩu"
-          placeholder="Tối thiểu 6 ký tự"
-          maxLength={32}
+          placeholder="Nhập mật khẩu"
+          maxLength={50}
           value={formData.password}
           onChange={updateField}
           error={errors.password}
@@ -111,21 +188,25 @@ export default function RegisterPage() {
           type="password"
           label="Nhập lại mật khẩu"
           placeholder="Xác nhận lại mật khẩu"
-          maxLength={32}
+          maxLength={50}
           value={formData.confirmPassword}
           onChange={updateField}
           error={errors.confirmPassword}
           required
         />
 
-        {message.text && (
-          <div className={`form-alert ${message.type}-alert`}>{message.text}</div>
-        )}
-
         <button type="submit" className="submit-btn" disabled={isSubmitting}>
           {isSubmitting ? 'Đang đăng ký...' : 'Đăng Ký Ngay'}
         </button>
       </form>
+      {apiAlert && (
+        <div
+          className={`api-alert ${apiAlert.type}-alert`}
+          role={apiAlert.type === 'error' ? 'alert' : 'status'}
+        >
+          {apiAlert.text}
+        </div>
+      )}
     </AuthLayout>
   )
 }

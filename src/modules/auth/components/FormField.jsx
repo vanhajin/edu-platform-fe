@@ -9,6 +9,7 @@ export default function FormField({ label, error, required = false, ...inputProp
       </label>
       <input
         {...inputProps}
+        required={required}
         className="form-input"
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
