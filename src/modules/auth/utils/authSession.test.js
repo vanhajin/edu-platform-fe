@@ -3,7 +3,10 @@ import { afterEach, test } from 'node:test'
 
 import {
   completeLogin,
+  getDeviceId,
   getRoleDestination,
+  isTokenExpired,
+  saveRefreshedSession,
   saveAuthSession,
 } from './authSession.js'
 
@@ -17,6 +20,23 @@ globalThis.localStorage = {
 }
 
 afterEach(() => storage.clear())
+
+test('getDeviceId creates and reuses a UUID for login requests', () => {
+  const firstDeviceId = getDeviceId()
+  const secondDeviceId = getDeviceId()
+
+  assert.match(firstDeviceId, /^[0-9a-f-]{36}$/i)
+  assert.equal(secondDeviceId, firstDeviceId)
+  assert.equal(localStorage.getItem('device_id'), firstDeviceId)
+})
+
+test('isTokenExpired detects an expired JWT access token', () => {
+  const expiredToken = `header.${Buffer.from(JSON.stringify({ exp: 1000 })).toString('base64url')}.signature`
+  const validToken = `header.${Buffer.from(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 60 })).toString('base64url')}.signature`
+
+  assert.equal(isTokenExpired(expiredToken), true)
+  assert.equal(isTokenExpired(validToken), false)
+})
 
 test('saveAuthSession persists tokens returned with user data', () => {
   saveAuthSession({
@@ -33,6 +53,18 @@ test('saveAuthSession persists tokens returned with user data', () => {
   })
 })
 
+test('saveRefreshedSession replaces access token and preserves session data', () => {
+  localStorage.setItem('access_token', 'expired-access-token')
+  localStorage.setItem('refresh_token', 'refresh-token')
+  localStorage.setItem('auth_user', JSON.stringify({ role: 'STUDENT' }))
+
+  saveRefreshedSession({ data: { accessToken: 'new-access-token' } })
+
+  assert.equal(localStorage.getItem('access_token'), 'new-access-token')
+  assert.equal(localStorage.getItem('refresh_token'), 'refresh-token')
+  assert.deepEqual(JSON.parse(localStorage.getItem('auth_user')), { role: 'STUDENT' })
+})
+
 test('saveAuthSession accepts a nested API payload', () => {
   saveAuthSession({
     data: {
@@ -44,6 +76,25 @@ test('saveAuthSession accepts a nested API payload', () => {
   assert.equal(localStorage.getItem('access_token'), 'nested-access-token')
   assert.equal(localStorage.getItem('refresh_token'), null)
   assert.equal(JSON.parse(localStorage.getItem('auth_user')).role, 'STUDENT')
+})
+
+test('completeLogin routes and persists user info from the login API contract', () => {
+  const destination = completeLogin({
+    data: {
+      accessToken: 'contract-access-token',
+      refreshToken: 'contract-refresh-token',
+      info: { userId: 'ADMIN-1', username: 'admin', role: 'ADMIN' },
+    },
+  })
+
+  assert.equal(destination, '/admin')
+  assert.equal(localStorage.getItem('access_token'), 'contract-access-token')
+  assert.equal(localStorage.getItem('refresh_token'), 'contract-refresh-token')
+  assert.deepEqual(JSON.parse(localStorage.getItem('auth_user')), {
+    userId: 'ADMIN-1',
+    username: 'admin',
+    role: 'ADMIN',
+  })
 })
 
 test('getRoleDestination maps only supported roles', () => {

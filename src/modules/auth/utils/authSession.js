@@ -4,18 +4,52 @@ const ROLE_DESTINATIONS = {
   STUDENT: '/student',
 }
 
+const DEVICE_ID_KEY = 'device_id'
+
+export function getDeviceId() {
+  let deviceId = localStorage.getItem(DEVICE_ID_KEY)
+
+  if (!deviceId) {
+    deviceId = crypto.randomUUID()
+    localStorage.setItem(DEVICE_ID_KEY, deviceId)
+  }
+
+  return deviceId
+}
+
+export function isTokenExpired(token) {
+  if (typeof token !== 'string' || !token.trim()) return true
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return typeof payload.exp !== 'number' || payload.exp * 1000 <= Date.now()
+  } catch {
+    return true
+  }
+}
+
+export function clearAuthSession() {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
+  localStorage.removeItem('auth_user')
+}
+
 export function normalizeAuthPayload(payload) {
   const responseBody = payload?.data ?? payload ?? {}
-  return responseBody?.data ?? responseBody
+  const authData = responseBody?.data ?? responseBody
+
+  if (authData?.user || !authData?.info) {
+    return authData
+  }
+
+  return { ...authData, user: authData.info }
 }
 
 export function saveAuthSession(payload) {
   const authData = normalizeAuthPayload(payload)
   const accessToken = authData.accessToken ?? authData.token
 
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
-  localStorage.removeItem('auth_user')
+  clearAuthSession()
   localStorage.setItem('access_token', accessToken)
 
   if (authData.refreshToken) {
@@ -26,6 +60,21 @@ export function saveAuthSession(payload) {
     localStorage.setItem('auth_user', JSON.stringify(authData.user))
   }
 
+  return authData
+}
+
+export function saveRefreshedSession(payload) {
+  const authData = normalizeAuthPayload(payload)
+  const accessToken = authData.accessToken ?? authData.token
+
+  if (typeof accessToken !== 'string' || !accessToken.trim()) {
+    throw new Error('Refresh không trả về access token hợp lệ.')
+  }
+
+  localStorage.setItem('access_token', accessToken)
+  if (authData.refreshToken) {
+    localStorage.setItem('refresh_token', authData.refreshToken)
+  }
   return authData
 }
 

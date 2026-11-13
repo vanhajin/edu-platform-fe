@@ -5,7 +5,7 @@ import AuthLayout, { AuthLink } from '../components/AuthLayout.jsx'
 import FormField from '../components/FormField.jsx'
 import { authService } from '../services/authService.js'
 import { getApiErrorMessage } from '../utils/apiError.js'
-import { completeLogin } from '../utils/authSession.js'
+import { completeLogin, getDeviceId } from '../utils/authSession.js'
 import { validateLoginForm } from '../utils/authValidation.js'
 
 const INITIAL_FORM = { account: '', password: '', rememberMe: false }
@@ -41,8 +41,9 @@ export default function LoginPage() {
 
     try {
       const response = await authService.login({
-        email: formData.account.trim(),
+        account: formData.account.trim(),
         password: formData.password,
+        deviceId: getDeviceId(),
       })
       const destination = completeLogin(response)
       navigate(destination, { replace: true })

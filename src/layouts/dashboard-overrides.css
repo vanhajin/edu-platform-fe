@@ -1,0 +1,172 @@
+/* SVG icons need explicit visual sizes after the static HTML icon helper was replaced. */
+.dashboard-shell { --dashboard-ink: #15223b; --dashboard-copy: #63738d; --dashboard-line: #e5ebf4; }
+.main { color: var(--dashboard-ink); }
+.main, .main button, .main input, .main select { font-family: Inter, "Segoe UI", sans-serif; }
+.main .crumb { font-size: 12px; letter-spacing: .01em; }
+.main .page-head { align-items: flex-start; }
+.main .page-head h1 { font-size: clamp(25px, 2vw, 30px); line-height: 1.2; letter-spacing: -.7px; font-weight: 800; color: var(--dashboard-ink); }
+.main .page-head p { max-width: 640px; margin-top: 7px; font-size: 13px; line-height: 1.6; color: var(--dashboard-copy); }
+.main .hero, .main .admin-hero { box-shadow: 0 16px 34px rgba(30, 64, 175, .15); }
+.main .hero h1, .main .admin-hero h2 { font-size: clamp(24px, 2vw, 30px); letter-spacing: -.6px; line-height: 1.25; }
+.main .hero p, .main .admin-hero p { max-width: 580px; font-size: 14px; line-height: 1.65; }
+.main .stats { gap: 16px; }
+.main .stat { padding: 21px 22px; border-color: var(--dashboard-line); }
+.main .stat small { font-size: 12px; font-weight: 600; color: var(--dashboard-copy); }
+.main .stat strong { font-size: clamp(24px, 2vw, 28px); line-height: 1.05; letter-spacing: -.6px; }
+.main .stat em { display: block; margin-top: 7px; line-height: 1.35; }
+.main .chart-card { border-color: var(--dashboard-line); box-shadow: 0 10px 28px rgba(26, 55, 110, .045); }
+.main .chart-card h2 { font-size: 16px; line-height: 1.4; font-weight: 800; letter-spacing: -.2px; }
+.main .chart-card p { margin-top: 5px; font-size: 12px; line-height: 1.55; color: var(--dashboard-copy); }
+.main .bar-meta { font-size: 12px; line-height: 1.45; }
+.main .bar-meta span, .main .bar-meta strong { max-width: 78%; }
+.main .listline { font-size: 13px; line-height: 1.45; }
+.main .course-row { padding: 14px 0; }
+.main .course-row strong { font-size: 13px; line-height: 1.45; }
+.main .course-row small { font-size: 12px; }
+.main .table-scroll table { font-size: 13px; }
+.main .table-scroll th { font-size: 11px; letter-spacing: .55px; color: #71819a; }
+.main .table-scroll td { color: #40516c; }
+.main .table-scroll td strong { color: #17253e; font-weight: 750; }
+.brand-icon svg { width: 24px; height: 24px; }
+.nav-link svg,
+.nav-group svg { width: 21px; height: 21px; stroke-width: 2.1; }
+.nav-group .chevron { width: 16px; height: 16px; }
+.icon-btn svg { width: 22px; height: 22px; stroke-width: 2.1; }
+.stat-icon { width: 50px; height: 50px; }
+.stat-icon svg { width: 28px; height: 28px; stroke-width: 2.1; }
+.chart-card h2 svg { width: 21px; height: 21px; stroke-width: 2.1; }
+.admin-hero > svg { width: 60px; height: 60px; stroke-width: 1.9; }
+.student-hero-art { width: 190px; min-height: 154px; display: grid; place-items: center; border: 1px solid #ffffff38; border-radius: 25px; background: #ffffff14; color: #fff; font-size: 40px; font-weight: 800; transform: rotate(-7deg); flex-shrink: 0; }
+.account-menu { position: relative; }
+.user-button > svg { color: #94a3b8; }
+.profile-menu { right: 0; top: 52px; }
+.profile-menu button { width: 100%; border: 0; background: transparent; display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 8px; font-size: 13px; color: #172033; text-align: left; }
+.profile-menu button:hover { background: #f1f5f9; }
+.page-head { margin: 2px 0 26px; }
+.page-head h1 { font-size: 28px; }
+.filter-card { padding: 22px 24px; box-shadow: 0 8px 28px rgba(30, 64, 175, .04); }
+.filter-card::before { content: 'BỘ LỌC TÌM KIẾM'; display: block; margin-bottom: 18px; font-size: 11px; letter-spacing: 1.2px; font-weight: 800; color: #64748b; }
+.filter-grid { grid-template-columns: minmax(220px, 1.6fr) minmax(180px, 1fr) auto auto; gap: 14px; }
+.filter-grid .btn { min-height: 42px; align-self: end; }
+.filter-grid .btn svg { width: 17px; height: 17px; }
+.table-card { border-radius: 16px; box-shadow: 0 10px 30px rgba(30, 64, 175, .05); }
+.table-heading { padding: 22px 24px; }
+.table-scroll table th { padding-top: 16px; padding-bottom: 16px; }
+.table-scroll table td { padding-top: 16px; padding-bottom: 16px; }
+.actions { gap: 8px; }
+.act { width: 34px; height: 34px; }
+.act svg { width: 17px; height: 17px; }
+@media (max-width: 1100px) { .filter-grid, .student-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .page-head h1 { font-size: 24px; } .filter-card { padding: 18px; } .filter-grid, .student-filter-grid { grid-template-columns: 1fr; } .filter-grid .btn { width: 100%; } }
+
+@media (max-width: 760px) {
+  .nav-link svg,
+  .nav-group svg { width: 22px; height: 22px; }
+  .student-hero-art { display: none; }
+  .main .hero h1, .main .admin-hero h2 { font-size: 24px; }
+  .main .hero p, .main .admin-hero p { font-size: 13px; }
+}
+
+/* Dashboard typography scale: quieter headings and a consistent reading rhythm. */
+.dashboard-shell { font-size: 14px; }
+.sidebar .brand { font-size: 20px; letter-spacing: -.35px; }
+.sidebar .nav-caption { font-size: 10px; line-height: 1.3; }
+.sidebar .nav-link,
+.sidebar .nav-group { font-size: 13px; line-height: 1.35; font-weight: 600; }
+.topbar .crumb { font-size: 13px; font-weight: 500; }
+.topbar .crumb b { font-weight: 700; text-transform: capitalize; }
+.user-button strong { font-size: 13px; font-weight: 700; line-height: 1.25; }
+.user-button small { font-size: 11px; line-height: 1.35; }
+.main .page-head h1 { font-size: clamp(25px, 1.9vw, 29px); font-weight: 700; letter-spacing: -.55px; }
+.main .page-head p { font-size: 14px; font-weight: 400; letter-spacing: 0; }
+.main .hero h1,
+.main .admin-hero h2 { font-weight: 700; letter-spacing: -.45px; }
+.main .hero p,
+.main .admin-hero p { font-size: 14px; font-weight: 400; }
+.main .stat small { letter-spacing: 0; font-weight: 600; }
+.main .stat strong { font-weight: 700; }
+.main .stat em { font-size: 12px; font-weight: 500; }
+.main .chart-card h2 { font-size: 16px; font-weight: 700; }
+.main .chart-card p { font-size: 12.5px; line-height: 1.5; }
+.main .bar-meta,
+.main .listline { font-size: 13px; }
+.main .field label { font-size: 12px; font-weight: 650; letter-spacing: .01em; }
+.main .field input,
+.main .field select { font-size: 13px; }
+.main .btn { font-size: 13px; font-weight: 650; letter-spacing: 0; }
+.main .table-heading h2 { font-size: 16px; font-weight: 700; }
+.main .table-scroll th { font-size: 11px; font-weight: 700; }
+.main .table-scroll td { font-size: 13px; line-height: 1.45; }
+.main .pagination { font-size: 12px; }
+.buyer-filter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.buyer-filter-grid .filter-actions { display: flex; align-items: end; gap: 8px; }
+.buyer-filter-grid .filter-actions .btn { min-height: 42px; }
+.role-filter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.role-filter-grid .filter-actions { display: flex; align-items: end; gap: 8px; }
+.role-filter-grid .filter-actions,
+.buyer-filter-grid .filter-actions { width: max-content; max-width: 100%; justify-self: start; }
+.role-filter-grid .filter-actions .btn,
+.buyer-filter-grid .filter-actions .btn { width: auto; flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 1100px) { .role-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .role-filter-grid { grid-template-columns: 1fr; } .role-filter-grid .filter-actions { display: grid; grid-template-columns: 1fr; width: 100%; } .role-filter-grid .filter-actions .btn { width: 100%; } }
+@media (max-width: 1100px) { .buyer-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .buyer-filter-grid { grid-template-columns: 1fr; } .buyer-filter-grid .filter-actions { display: grid; grid-template-columns: 1fr; width: 100%; } .buyer-filter-grid .filter-actions .btn { width: 100%; } }
+
+/* Shared responsive behavior for every authenticated screen. */
+@media (max-width: 1024px) {
+  .sidebar { width: 76px; }
+  .app { margin-left: 76px; }
+  .brand { padding: 0 19px; }
+  .brand-text,
+  .nav-label,
+  .nav-caption,
+  .side-bottom,
+  .nav-group .nav-label,
+  .nav-link .nav-label,
+  .nav-group .chevron { display: none; }
+  .nav-link,
+  .nav-group { justify-content: center; }
+  .subnav { padding: 0; }
+  .subnav .nav-link { padding: 12px; }
+  .nav { padding: 12px 9px; }
+  .dashboard-grid,
+  .profile-grid { grid-template-columns: 1fr; }
+  .main { padding: 26px 24px; }
+  .hero-copy { max-width: 62%; }
+}
+
+@media (max-width: 640px) {
+  .main { padding: 20px 14px 28px; }
+  .topbar { height: 68px; padding: 0 14px; }
+  .top-left { gap: 10px; min-width: 0; }
+  .crumb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top-actions { gap: 8px; }
+  .user-button .user-text,
+  .user-button > svg { display: none; }
+  .page-head { flex-direction: column; gap: 14px; margin-bottom: 20px; }
+  .page-head > .btn { width: 100%; }
+  .hero,
+  .admin-hero { min-height: 0; padding: 24px 22px; }
+  .hero-copy { max-width: 100%; }
+  .hero img,
+  .admin-hero > svg,
+  .student-hero-art { display: none; }
+  .stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat { padding: 17px; }
+  .stat-icon { width: 42px; height: 42px; }
+  .stat-icon svg { width: 23px; height: 23px; }
+  .chart-card,
+  .profile-panel { padding: 18px; }
+  .table-card { border-radius: 13px; }
+  .table-scroll { margin: 0 -1px; }
+  .pagination { align-items: flex-start; flex-direction: column; padding: 16px 18px; }
+  .pages { flex-wrap: wrap; }
+}
+
+@media (max-width: 420px) {
+  .stats { grid-template-columns: 1fr; }
+  .page-head h1 { font-size: 23px; }
+  .hero h1,
+  .admin-hero h2 { font-size: 22px; }
+  .icon-btn { width: 36px; height: 36px; }
+}

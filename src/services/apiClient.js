@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { requireApiUrl } from '../config/apiUrls.js'
+import { clearAuthSession, saveRefreshedSession } from '../modules/auth/utils/authSession.js'
 
 const fallbackBaseURL = import.meta.env.VITE_API_BASE_URL || requireApiUrl('auth')
 
@@ -20,32 +21,22 @@ export function createApiClient(baseURL = fallbackBaseURL) {
   client.interceptors.response.use(
     (response) => response,
     async (error) => {
-      const originalRequest = error.config
-
-      if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-        originalRequest._retry = true
+      if (error.response?.status === 401) {
         const refreshToken = localStorage.getItem('refresh_token')
-
-        if (refreshToken) {
+        if (refreshToken && !error.config?._retry && !error.config?.url?.endsWith('/refresh')) {
           try {
-            const refreshResponse = await axios.post(`${baseURL}/auth/refresh`, {
-              refreshToken,
-            })
-            const accessToken =
-              refreshResponse.data.accessToken ?? refreshResponse.data.data?.accessToken
-
-            if (accessToken) {
-              localStorage.setItem('access_token', accessToken)
-              originalRequest.headers.Authorization = `Bearer ${accessToken}`
-              return client(originalRequest)
-            }
+            const refreshResponse = await axios.post(`${baseURL}/refresh`, { refreshToken })
+            const refreshed = saveRefreshedSession(refreshResponse)
+            error.config._retry = true
+            error.config.headers.Authorization = `Bearer ${refreshed.accessToken}`
+            return client(error.config)
           } catch {
-            localStorage.removeItem('access_token')
-            localStorage.removeItem('refresh_token')
-            localStorage.removeItem('auth_user')
-            window.location.href = '/login'
+            clearAuthSession()
           }
+        } else {
+          clearAuthSession()
         }
+        window.location.href = '/login'
       }
 
       return Promise.reject(error)

@@ -1,11 +1,13 @@
 import { authApiClient, createApiClient } from '../../../services/apiClient.js'
 
-const registrationApiClient = import.meta.env.DEV
+const authServiceApiClient = import.meta.env.DEV
   ? createApiClient('/auth-proxy')
   : authApiClient
 
 export const authService = {
-  login: (credentials) => authApiClient.post('/auth/login', credentials),
-  register: (formData) => registrationApiClient.post('/register-student', formData),
-  resetPassword: (payload) => authApiClient.post('/auth/reset-password', payload),
+  login: (credentials) => authServiceApiClient.post('/login', credentials),
+  refresh: (refreshToken) => authServiceApiClient.post('/refresh', { refreshToken }),
+  register: (formData) => authServiceApiClient.post('/register-student', formData),
+  resetPassword: (payload) =>
+    authServiceApiClient.post('/reset-password', payload),
 }
